@@ -101,9 +101,6 @@
                                                 <rect key="frame" x="65" y="0.0" width="249" height="34"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                 <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" keyboardType="phonePad" textContentType="tel"/>
-                                                <connections>
-                                                    <action selector="numberFieldEdited:" destination="rHc-fO-CW2" eventType="editingChanged" id="Lam-67-pE0"/>
-                                                </connections>
                                             </textField>
                                         </subviews>
                                     </stackView>

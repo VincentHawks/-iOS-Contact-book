@@ -14,6 +14,7 @@ class ContactsViewController: UITableViewController {
     static let deleteContactNotificationCenter = Notification.Name("deleteContactNotification")
     static let editContactNotificationCenter = Notification.Name("editContactNotification")
     
+    // MARK: - Event handlers
     @objc func newContact(notification: Notification) {
         guard let data = notification.userInfo as? [String : String],
               let name = data["name"],
@@ -98,9 +99,10 @@ class ContactsViewController: UITableViewController {
         (tabBarController?.viewControllers?[1] as? RecentsViewController)?.passReference(toContactList: &contactList)
     }
     
+    // MARK: - viewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
-        print()
+
         NotificationCenter.default.addObserver(self, selector: #selector(newContact(notification:)), name: ContactsViewController.createContactNotificationCenter, object: nil)
         
         NotificationCenter.default.addObserver(self, selector: #selector(deleteContact(notification:)), name: ContactsViewController.deleteContactNotificationCenter, object: nil)
@@ -117,14 +119,6 @@ class ContactsViewController: UITableViewController {
         tabBarController?.viewControllers?[1].view // make it instantiated
         // Pass a reference to the contact list for the Recents screen to use (failed)
         (tabBarController?.viewControllers?[1] as? RecentsViewController)?.passReference(toContactList: &contactList)
-        
-        
-        
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
     }
     
     private func getContact(fromIndexPath indexPath: IndexPath) -> Contact {
@@ -168,50 +162,13 @@ class ContactsViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let contact = getContact(fromIndexPath: indexPath)
         NotificationCenter.default.post(name: RecentsViewController.callMadeNotificationChannel, object: self, userInfo: ["number" : contact.number])
-        print("Making a call...")
         guard let url = URL(string: "tel://" + contact.number) else { return }
         guard UIApplication.shared.canOpenURL(url) else {
             return
         }
         UIApplication.shared.open(url)
     }
-    
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
-    }
-    */
 
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
-    }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
@@ -227,6 +184,7 @@ class ContactsViewController: UITableViewController {
         
     }
     
+    // MARK: - Destructor
     deinit {
         NotificationCenter.default.removeObserver(self, name: ContactsViewController.createContactNotificationCenter, object: nil)
         NotificationCenter.default.removeObserver(self, name: ContactsViewController.editContactNotificationCenter, object: nil)
