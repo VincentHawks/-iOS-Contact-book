@@ -10,11 +10,13 @@ import UIKit
 class ContactsViewController: UITableViewController {
 
     var contactList = [String : [Contact]]()
+    var recents: RecentsViewController? = nil
     static let createContactNotificationCenter = Notification.Name("newContactNotification")
     static let deleteContactNotificationCenter = Notification.Name("deleteContactNotification")
     static let editContactNotificationCenter = Notification.Name("editContactNotification")
     
     // MARK: - Event handlers
+    
     @objc func newContact(notification: Notification) {
         guard let data = notification.userInfo as? [String : String],
               let name = data["name"],
@@ -32,11 +34,8 @@ class ContactsViewController: UITableViewController {
         if !contactList[firstLetter]!.contains(where: {(c) -> Bool in c.name == contact.name}) {
         contactList[firstLetter]!.append(contact)
         }
-        
+        recents!.contactAdded(name: name, number: number)
         tableView.reloadData()
-        
-        
-        (tabBarController?.viewControllers?[1] as? RecentsViewController)?.passReference(toContactList: &contactList)
     }
     
     @objc func editContact(notification: Notification) {
@@ -71,10 +70,8 @@ class ContactsViewController: UITableViewController {
         if !contactList[newFirstLetter]!.contains(where: {(c) -> Bool in c.name == name}) {
             contactList[newFirstLetter]?.append(Contact(name: name, number: number))
         }
-        
+        recents!.contactAltered(oldName: oldName, newName: name, newNumber: number)
         tableView.reloadData()
-        
-        (tabBarController?.viewControllers?[1] as? RecentsViewController)?.passReference(toContactList: &contactList)
     }
     
     @objc func deleteContact(notification: Notification) {
@@ -93,10 +90,8 @@ class ContactsViewController: UITableViewController {
         if contactList[firstLetter]!.isEmpty {
             contactList.remove(at: contactList.index(forKey: firstLetter)!)
         }
-        
+        recents!.contactRemoved(name: name, number: number)
         tableView.reloadData()
-        
-        (tabBarController?.viewControllers?[1] as? RecentsViewController)?.passReference(toContactList: &contactList)
     }
     
     // MARK: - viewDidLoad
@@ -116,9 +111,9 @@ class ContactsViewController: UITableViewController {
         contactList["E"] = [Contact(name: "Emergency", number: "112")]
         tableView.reloadData()
         
-        tabBarController?.viewControllers?[1].view // make it instantiated
+        recents = tabBarController?.viewControllers?[1] as? RecentsViewController
+        _ = recents!.view // make it instantiated
         // Pass a reference to the contact list for the Recents screen to use (failed)
-        (tabBarController?.viewControllers?[1] as? RecentsViewController)?.passReference(toContactList: &contactList)
     }
     
     private func getContact(fromIndexPath indexPath: IndexPath) -> Contact {
@@ -148,12 +143,7 @@ class ContactsViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "contactCell", for: indexPath) as! ContactCell
 
         // Configure the cell...
-        let contactKey = contactList.keys.sorted()[indexPath.section]
-        guard let contactsSection = contactList[contactKey] else {
-            fatalError("Illegal state")
-        }
-        let contact = contactsSection[indexPath.row]
-        cell.contact = contact
+        let contact = getContact(fromIndexPath: indexPath)
         cell.textLabel!.text = contact.name
 
         return cell
@@ -161,7 +151,7 @@ class ContactsViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let contact = getContact(fromIndexPath: indexPath)
-        NotificationCenter.default.post(name: RecentsViewController.callMadeNotificationChannel, object: self, userInfo: ["number" : contact.number])
+        recents!.callMade(number: contact.number, name: contact.name)
         guard let url = URL(string: "tel://" + contact.number) else { return }
         guard UIApplication.shared.canOpenURL(url) else {
             return

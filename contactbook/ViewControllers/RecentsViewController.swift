@@ -10,37 +10,69 @@ import UIKit
 struct Call {
     let timestamp: String
     let number: String
+    var name: String?
 }
 
 class RecentsViewController: UITableViewController {
 
-    var contactList = [String : [Contact]]()
     var callHistory = [Call]()
     
-    static let callMadeNotificationChannel = Notification.Name("callMade")
+    // MARK: - Update notification callbacks
     
-    // MARK: - Event handler
-    
-    @objc func callMade(notification: Notification) {
-        guard let data = notification.userInfo as? [String : String],
-              let number = data["number"]
-        else {
-            print("Failed to get call info")
-            return
-        }
-        
+    func callMade(number: String, name: String) {
         let date = Date()
         let calendar = Calendar.current
-        let year = calendar.component(.year, from: date)
-        let month = calendar.component(.month, from: date)
-        let day = calendar.component(.day, from: date)
-        let hour = calendar.component(.hour, from: date)
-        let minute = calendar.component(.minute, from: date)
-
-        let timestamp = "\(day).\(month).\(year) \(hour):\(minute)"
-        let call = Call(timestamp: timestamp, number: number)
-        callHistory.append(call)
-        
+        let y = calendar.component(.year, from: date)
+        let m = calendar.component(.month, from: date)
+        let d = calendar.component(.day, from: date)
+        let hh = calendar.component(.hour, from: date)
+        let mm = calendar.component(.minute, from: date)
+        let timestamp = String(format: "%02d.%02d.%04d %02d:%02d", d, m, y, hh, mm)
+        callHistory.append(Call(timestamp: timestamp, number: number, name: name))
+        tableView.reloadData()
+    }
+    
+    /// Checks if new contact's number had been dialed previously and renames it accordingly
+    func contactAdded(name: String, number: String) {
+        if callHistory.isEmpty {
+            return
+        }
+        for i in 0..<callHistory.count {
+            if callHistory[i].number == number {
+                callHistory[i].name = name
+            }
+        }
+        tableView.reloadData()
+    }
+    
+    /// Acts as if the old one was removed and the new one was created
+    func contactAltered(oldName: String, newName: String, newNumber: String) {
+        if callHistory.isEmpty {
+            return
+        }
+        for i in 1..<callHistory.count {
+            if callHistory[i].name == oldName {
+                callHistory[i].name = nil
+            }
+        }
+        for i in 1..<callHistory.count {
+            if callHistory[i].number == newNumber {
+                callHistory[i].name = newName
+            }
+        }
+        tableView.reloadData()
+    }
+    
+    /// Remove the name from the call records of the deleted contact, making the number be displayed instead of the name
+    func contactRemoved(name: String, number: String) {
+        if callHistory.isEmpty {
+            return
+        }
+        for i in 1..<callHistory.count {
+            if callHistory[i].name == name && callHistory[i].number == number {
+                callHistory[i].name = nil
+            }
+        }
         tableView.reloadData()
     }
     
@@ -50,16 +82,9 @@ class RecentsViewController: UITableViewController {
 
         tableView.delegate = self
         tableView.dataSource = self
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(callMade(notification:)), name: RecentsViewController.callMadeNotificationChannel, object: nil)
     }
 
     // MARK: - Table view data source
-
-    func passReference(toContactList list: inout [String : [Contact]]) {
-        self.contactList = list
-        tableView.reloadData()
-    }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
@@ -75,29 +100,15 @@ class RecentsViewController: UITableViewController {
 
         // Configure the cell...
         let call = callHistory[callHistory.count - indexPath.row - 1] // Most recent shown first
-        cell.number = call.number
         cell.detailTextLabel!.text = call.timestamp
         
-        // There's probably a way to make this more efficient
-        // Although if you think about it it's O(n), n = number of contacts, so not that bad
-        if let text = contactList.values.first(where: { carr -> Bool in
-            carr.contains(where: { c -> Bool in
-                c.number == call.number
-            })
-        })?.first(where: { c -> Bool in
-            c.number == call.number
-        })?.name {
-            cell.textLabel!.text = text
+        if call.name != nil {
+            cell.textLabel?.text = call.name
         } else {
-            cell.textLabel!.text = call.number
+            cell.textLabel?.text = call.number
         }
 
         return cell
-    }
-    
-    // MARK: - Destructor
-    deinit {
-        NotificationCenter.default.removeObserver(self, name: RecentsViewController.callMadeNotificationChannel, object: nil)
     }
 
 }
