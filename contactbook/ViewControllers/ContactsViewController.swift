@@ -6,6 +6,12 @@
 //
 
 import UIKit
+import Dispatch
+
+enum ParallelismMode {
+    case gcd
+    case opqueue
+}
 
 class ContactsViewController: UITableViewController {
 
@@ -14,6 +20,50 @@ class ContactsViewController: UITableViewController {
     static let createContactNotificationCenter = Notification.Name("newContactNotification")
     static let deleteContactNotificationCenter = Notification.Name("deleteContactNotification")
     static let editContactNotificationCenter = Notification.Name("editContactNotification")
+    
+    let contactUpdateThreshold = 250
+    
+    // MARK: - Contact list fetch
+    
+    func fetchGCD() {
+        let repository = GistContactRepository(path: "https://gist.githubusercontent.com/artgoncharov/d257658423edd46a9ead5f721b837b8c/raw/c38ace33a7c871e4ad3b347fc4cd970bb45561a3/contacts_data.json")
+        let queue = DispatchQueue(label: "DownloaderQueue", qos: .utility)
+        var updatedContacts = [String : [Contact]]()
+        queue.async {
+            let gistContacts = try! repository.getContacts()
+            for gistContact in gistContacts {
+                let contact = Contact(name: "\(gistContact.firstname) \(gistContact.lastname)", number: gistContact.phone)
+                guard let firstLetter = contact.name.first else {
+                    continue
+                }
+                if updatedContacts[firstLetter.uppercased()] == nil {
+                    updatedContacts[firstLetter.uppercased()] = [contact]
+                } else {
+                    updatedContacts[firstLetter.uppercased()]?.append(contact)
+                }
+            }
+        }
+        contactList = updatedContacts
+    }
+    
+    func fetchOpQueue() {
+        let repository = GistContactRepository(path: "https://gist.githubusercontent.com/artgoncharov/d257658423edd46a9ead5f721b837b8c/raw/c38ace33a7c871e4ad3b347fc4cd970bb45561a3/contacts_data.json")
+        
+        let queue = OperationQueue()
+        queue.name = "Downloader queue"
+        queue.maxConcurrentOperationCount = 1
+        
+        let downloader = DownloadOperation(repo: repository)
+        downloader.completionBlock = {
+            if downloader.isCancelled {
+                return
+            }
+            DispatchQueue.main.async { 
+                self.contactList = downloader.digestedContacts
+            }
+        }
+        queue.addOperation(downloader)
+    }
     
     // MARK: - Event handlers
     
@@ -107,13 +157,17 @@ class ContactsViewController: UITableViewController {
         tableView.dataSource = self
         tableView.delegate = self
         
-        contactList["J"] = [Contact(name: "John Doe", number: "88005553535")]
-        contactList["E"] = [Contact(name: "Emergency", number: "112")]
-        tableView.reloadData()
-        
         recents = tabBarController?.viewControllers?[1] as? RecentsViewController
         _ = recents!.view // make it instantiated
-        // Pass a reference to the contact list for the Recents screen to use (failed)
+        
+        // Fetch contacts data from web
+        switch GlobalDefinitions.parallelismMode {
+        case .gcd:
+            fetchGCD()
+        case .opqueue:
+            fetchOpQueue()
+        }
+        
     }
     
     private func getContact(fromIndexPath indexPath: IndexPath) -> Contact {

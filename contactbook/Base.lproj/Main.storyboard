@@ -299,6 +299,7 @@
         <scene sceneID="Bbs-CI-ZTC">
             <objects>
                 <tabBarController id="GrA-6d-LQM" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" id="A2k-oV-WVL"/>
                     <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="cwk-Ga-pqU">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="49"/>
                         <autoresizingMask key="autoresizingMask"/>

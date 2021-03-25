@@ -22,6 +22,10 @@
 		A9D3CDD5260849A80057DBEF /* ContactCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D3CDD4260849A80057DBEF /* ContactCell.swift */; };
 		A9D3CDDA260964CF0057DBEF /* EditContactViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D3CDD9260964CF0057DBEF /* EditContactViewController.swift */; };
 		A9D3CDE0260976A00057DBEF /* RecentViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D3CDDF260976A00057DBEF /* RecentViewCell.swift */; };
+		A9D3CDF1260BFF480057DBEF /* ContactRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D3CDF0260BFF480057DBEF /* ContactRepository.swift */; };
+		A9D3CDF9260C07930057DBEF /* ModeSelectorViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D3CDF8260C07930057DBEF /* ModeSelectorViewController.swift */; };
+		A9D3CDFE260C095E0057DBEF /* GlobalDefinitions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D3CDFD260C095E0057DBEF /* GlobalDefinitions.swift */; };
+		A9D3CE03260C18A00057DBEF /* DownloadOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9D3CE02260C18A00057DBEF /* DownloadOperation.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,6 +67,10 @@
 		A9D3CDD4260849A80057DBEF /* ContactCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactCell.swift; sourceTree = "<group>"; };
 		A9D3CDD9260964CF0057DBEF /* EditContactViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditContactViewController.swift; sourceTree = "<group>"; };
 		A9D3CDDF260976A00057DBEF /* RecentViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecentViewCell.swift; sourceTree = "<group>"; };
+		A9D3CDF0260BFF480057DBEF /* ContactRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactRepository.swift; sourceTree = "<group>"; };
+		A9D3CDF8260C07930057DBEF /* ModeSelectorViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModeSelectorViewController.swift; sourceTree = "<group>"; };
+		A9D3CDFD260C095E0057DBEF /* GlobalDefinitions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalDefinitions.swift; sourceTree = "<group>"; };
+		A9D3CE02260C18A00057DBEF /* DownloadOperation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadOperation.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,6 +121,7 @@
 		A9D3CD702603AC900057DBEF /* contactbook */ = {
 			isa = PBXGroup;
 			children = (
+				A9D3CDEF260BFF340057DBEF /* Repositories */,
 				A9D3CDDE2609766F0057DBEF /* Models */,
 				A9D3CDBE260802CF0057DBEF /* ViewControllers */,
 				A9D3CD712603AC900057DBEF /* AppDelegate.swift */,
@@ -121,6 +130,7 @@
 				A9D3CD7A2603AC930057DBEF /* Assets.xcassets */,
 				A9D3CD7C2603AC930057DBEF /* LaunchScreen.storyboard */,
 				A9D3CD7F2603AC930057DBEF /* Info.plist */,
+				A9D3CDFD260C095E0057DBEF /* GlobalDefinitions.swift */,
 			);
 			path = contactbook;
 			sourceTree = "<group>";
@@ -151,6 +161,7 @@
 				A9D3CDBF2608030B0057DBEF /* NewContactViewController.swift */,
 				A9D3CDC4260803800057DBEF /* ContactInfoViewController.swift */,
 				A9D3CDD9260964CF0057DBEF /* EditContactViewController.swift */,
+				A9D3CDF8260C07930057DBEF /* ModeSelectorViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -161,8 +172,17 @@
 				A9D3CDCC260824CB0057DBEF /* Contact.swift */,
 				A9D3CDD4260849A80057DBEF /* ContactCell.swift */,
 				A9D3CDDF260976A00057DBEF /* RecentViewCell.swift */,
+				A9D3CE02260C18A00057DBEF /* DownloadOperation.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		A9D3CDEF260BFF340057DBEF /* Repositories */ = {
+			isa = PBXGroup;
+			children = (
+				A9D3CDF0260BFF480057DBEF /* ContactRepository.swift */,
+			);
+			path = Repositories;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -295,12 +315,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A9D3CDF9260C07930057DBEF /* ModeSelectorViewController.swift in Sources */,
 				A9D3CDD5260849A80057DBEF /* ContactCell.swift in Sources */,
+				A9D3CDFE260C095E0057DBEF /* GlobalDefinitions.swift in Sources */,
 				A9D3CD722603AC900057DBEF /* AppDelegate.swift in Sources */,
 				A9D3CDC02608030B0057DBEF /* NewContactViewController.swift in Sources */,
+				A9D3CDF1260BFF480057DBEF /* ContactRepository.swift in Sources */,
 				A9D3CDCD260824CB0057DBEF /* Contact.swift in Sources */,
 				A9D3CDBA260802B40057DBEF /* RecentsViewController.swift in Sources */,
 				A9D3CDE0260976A00057DBEF /* RecentViewCell.swift in Sources */,
+				A9D3CE03260C18A00057DBEF /* DownloadOperation.swift in Sources */,
 				A9D3CDDA260964CF0057DBEF /* EditContactViewController.swift in Sources */,
 				A9D3CD742603AC900057DBEF /* SceneDelegate.swift in Sources */,
 				A9D3CDB22608028B0057DBEF /* ContactsViewController.swift in Sources */,
