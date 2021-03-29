@@ -15,13 +15,11 @@ enum ParallelismMode {
 
 class ContactsViewController: UITableViewController {
 
-    var contactList = [String : [Contact]]()
-    var recents: RecentsViewController? = nil
+    var contactList: [String : [Contact]] = [:]
+    var recents: RecentsViewController?
     static let createContactNotificationCenter = Notification.Name("newContactNotification")
     static let deleteContactNotificationCenter = Notification.Name("deleteContactNotification")
     static let editContactNotificationCenter = Notification.Name("editContactNotification")
-    
-    let contactUpdateThreshold = 250
     
     // MARK: - Contact list fetch
     
@@ -32,7 +30,7 @@ class ContactsViewController: UITableViewController {
         queue.async {
             let gistContacts = try! repository.getContacts()
             for gistContact in gistContacts {
-                let contact = Contact(name: "\(gistContact.firstname) \(gistContact.lastname)", number: gistContact.phone)
+                let contact = Contact(name: "\(gistContact.firstName) \(gistContact.lastName)", number: gistContact.phone)
                 guard let firstLetter = contact.name.first else {
                     continue
                 }
@@ -58,8 +56,13 @@ class ContactsViewController: UITableViewController {
             if downloader.isCancelled {
                 return
             }
+            if !downloader.success {
+                print("Failed to fetch contact data")
+                return
+            }
             DispatchQueue.main.async { 
                 self.contactList = downloader.digestedContacts
+                self.tableView.reloadData()
             }
         }
         queue.addOperation(downloader)

@@ -10,22 +10,27 @@ import Foundation
 class DownloadOperation : Operation {
     
     let repository: ContactRepository
-    var digestedContacts = [String : [Contact]]()
+    var digestedContacts: [String : [Contact]] = [:]
+    var success: Bool = true
 
     init(repo: ContactRepository) {
         self.repository = repo
-
     }
     
     override func main() {
         if isCancelled {
             return
         }
-        
-        let gistContacts = try! repository.getContacts()
+        let gistContacts: [GistContact]
+        do {
+            gistContacts = try repository.getContacts()
+        } catch {
+            success = false
+            return
+        }
         
         for gistContact in gistContacts {
-            let contact = Contact(name: "\(gistContact.firstname) \(gistContact.lastname)", number: gistContact.phone)
+            let contact = Contact(name: "\(gistContact.firstName) \(gistContact.lastName)", number: gistContact.phone)
             guard let firstLetter = contact.name.first else {
                 continue
             }

@@ -29,7 +29,7 @@ class ContactInfoViewController: UIViewController {
     }
     
     @IBAction func deleteButtonPressed(_ sender: UIButton) {
-        NotificationCenter.default.post(name: ContactsViewController.deleteContactNotificationCenter, object: self, userInfo: ["name":nameLabel.text, "number":phoneLabel.text])
+        NotificationCenter.default.post(name: ContactsViewController.deleteContactNotificationCenter, object: self, userInfo: ["name":nameLabel.text!, "number":phoneLabel.text!])
         navigationController?.popViewController(animated: true)
     }
     

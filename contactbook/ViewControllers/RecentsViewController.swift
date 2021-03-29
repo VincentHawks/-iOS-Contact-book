@@ -20,14 +20,12 @@ class RecentsViewController: UITableViewController {
     // MARK: - Update notification callbacks
     
     func callMade(number: String, name: String) {
+        let formatter = DateFormatter()
         let date = Date()
-        let calendar = Calendar.current
-        let y = calendar.component(.year, from: date)
-        let m = calendar.component(.month, from: date)
-        let d = calendar.component(.day, from: date)
-        let hh = calendar.component(.hour, from: date)
-        let mm = calendar.component(.minute, from: date)
-        let timestamp = String(format: "%02d.%02d.%04d %02d:%02d", d, m, y, hh, mm)
+        formatter.locale = Locale(identifier: "en_us_POSIX")
+        formatter.setLocalizedDateFormatFromTemplate("dd.MM.yyyy hh:mm")
+        let timestamp = formatter.string(from: date)
+        
         callHistory.append(Call(timestamp: timestamp, number: number, name: name))
         tableView.reloadData()
     }

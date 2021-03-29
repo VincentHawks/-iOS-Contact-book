@@ -9,10 +9,17 @@ import Foundation
 import Dispatch
 
 struct GistContact : Codable {
-    var firstname: String
-    var lastname: String
+    var firstName: String
+    var lastName: String
     var phone: String
     var email: String
+    
+    enum CodingKeys: String, CodingKey {
+        case firstName = "firstname"
+        case lastName = "lastname"
+        case phone
+        case email
+    }
 }
 
 protocol ContactRepository {
@@ -20,6 +27,7 @@ protocol ContactRepository {
 }
 
 class RequestFailed : Error {}
+class RequestTimeout : Error {}
 
 class GistContactRepository : ContactRepository {
     
@@ -35,27 +43,28 @@ class GistContactRepository : ContactRepository {
         
         let url = URL(string: path)
         let request = URLRequest(url: url!)
-        var result: [GistContact] = []
+        var result = [GistContact]()
         let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
             defer {
                 sem.signal()
             }
-            // TODO: handle error
             do {
                 guard let data = data, error == nil else {
                     throw error ?? RequestFailed()
                 }
-                // TODO: parse data
                 result = try JSONDecoder().decode([GistContact].self, from: data)
             } catch {
                 print("Request failed")
             }
         }
         task.resume()
-        // TODO: add timeout
-        _ = sem.wait(timeout: .now() + .seconds(10))
-        return result
-        
+        let timeoutResult = sem.wait(timeout: .now() + .seconds(20))
+        switch timeoutResult {
+        case .success:
+            return result
+        case .timedOut:
+            print("Request timeout")
+            throw RequestTimeout()
+        }
     }
-    
 }
